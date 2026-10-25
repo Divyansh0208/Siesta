@@ -1,9 +1,11 @@
-# Siesta
+# Siesta 🌙
 
-Plan next week's posts while you sleep, and find out honestly whether your own history
-predicts what works. If it doesn't, Siesta says so and tells you to go back to sleep.
+**Plan next week's posts while you sleep, and find out honestly whether your own history predicts what works.**
+If it doesn't, Siesta says so and tells you to go back to sleep.
 
-Runs on your computer. Model-written drafts use Google's free Gemini API (a free key, no card). No telemetry.
+Runs on your computer. Drafts come from Google's free Gemini API (free key, no card). No telemetry.
+
+![Siesta plan: drafted posts with scores, days and edit controls](docs/plan.png)
 
 ## What it does
 
@@ -14,34 +16,43 @@ Runs on your computer. Model-written drafts use Google's free Gemini API (a free
    20% picks, and the measured hit rate of its Strong / Toss-up / Weak groups. If the range
    includes a coin flip, the verdict is "no signal" and drafts stay unranked.
 3. **Brief.** Type it, or point Siesta at a git folder or notes file and it reads your recent work.
-4. **Plan.** Google's Gemini (free tier) drafts titles, tags and outlines. Code,
-   not the model, computes every feature and score. Non-Strong drafts get one revision that is
-   kept only if it scores higher. Edit anything and press Rescore (instant). Download `plan.csv`.
+4. **Plan.** Gemini drafts titles, tags and outlines. Code, not the model, computes every feature
+   and score. Non-Strong drafts get one revision that is kept only if it scores higher. Edit
+   anything and press Rescore (instant). Download `plan.csv`.
 
 Without a key it falls back to plain templates, so the whole flow still works.
+
+![Reality check: verdict, AUC with range, lift and hit rate per group](docs/check.png)
 
 ## Run it
 
 Python 3.10 or newer.
 
 ```bash
+git clone https://github.com/YOUR_USER/siesta.git
+cd siesta
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python -m siesta                 # opens http://127.0.0.1:8765
 ```
 
-For model-written drafts, get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-and paste it into the `.env` file in the project folder (copy `.env.example` if it is missing):
+No data yet? Press **Just let me try it** in step 1 for made-up demo posts.
+
+### Gemini key (optional, free)
+
+1. Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+2. Copy `.env.example` to `.env` and paste it in:
 
 ```
 GEMINI_API_KEY=your-key
 ```
 
-A real `GEMINI_API_KEY` environment variable also works and wins over `.env`.
+A real `GEMINI_API_KEY` environment variable also works and wins over `.env`. `.env` is git-ignored.
 
-Siesta lists the Gemini Flash models your key can use (default `gemini-2.5-flash`). The free tier is
-rate limited, so Siesta waits and retries; if Google still refuses, it falls back to templates.
+Siesta lists the Gemini Flash models your key can use, stable ones first. Google's free tier is
+rate limited and sometimes busy or closed to older models, so Siesta retries, then tries the next
+model, and only then falls back to templates. The run log says what happened.
 
 ### Hands-off weekly run
 
@@ -54,14 +65,14 @@ python -m siesta schedule --day mon --time 02:00 --git ~/code/my-project
 `schedule` only prints a cron line and a Windows `schtasks` line. It creates nothing.
 Plans land in `data/plans/` as JSON and CSV. Open the app in the morning to read the latest one.
 
-## Why open matters here
+## Why this design
 
 - **Auditable.** The judge of your posts is a logistic regression you can read, with the same
   split and settings every run. A hosted black box can't show you why it said no.
 - **Mostly private.** Your history and scores stay on the machine. The only network calls are the
-  optional DEV fetch and Gemini, which receives your brief, your common tags and the draft being revised.
-  Google may use free-tier prompts to improve its products, so keep secrets out of the brief.
-- **Swappable and free.** Pick any Gemini Flash model your key can use. Nothing to pay per run on the free tier.
+  optional DEV fetch and Gemini, which receives your brief, your common tags and the draft being
+  revised. Google may use free-tier prompts to improve its products, so keep secrets out of the brief.
+- **Free.** Nothing to pay per run on the free tier.
 - **Honest limits.** I did not compare draft quality across models. The judge is the same either way.
 
 ## Method, fixed in advance
@@ -75,10 +86,12 @@ associations from your history, not proof of cause.
 
 ## Limits
 
-- A small history gives wide ranges and a verdict of "no signal" is the likely, correct answer.
+- A small history gives wide ranges, and a verdict of "no signal" is the likely, correct answer.
 - The demo data is made up and has a planted pattern. It is for trying the app only.
 - Hours and days are UTC, with your local time shown next to them.
 - DEV posts newer than 14 days are skipped while reactions settle.
+- Gemini's free tier changes often (rate limits, which models are open). If drafts fall back to
+  templates, read the run log in step 3.
 
 ## Tests
 
@@ -87,4 +100,4 @@ pip install pytest
 python -m pytest
 ```
 
-MIT licence. See `LICENSE`.
+No key needed. MIT licence, see `LICENSE`.
