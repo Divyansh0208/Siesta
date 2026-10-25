@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Siesta: your week, drafted while you sleep</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23181c36'/%3E%3Cpath d='M20 6a10 10 0 1 0 6 16 8 8 0 0 1-6-16z' fill='%23f2c46d'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0e1118;--bg2:#0a0d13;--card:#151a24;--card2:#1b2130;--line:#283043;--text:#ecebe6;--mute:#9ba3b4;--accent:#f0b95a;--ink:#241600;--good:#62d6b0;--bad:#ff9d9d;--mid:#8db4ff;--r:14px;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+@media (prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#f6f1e7;--bg2:#efe8d8;--card:#fffcf5;--card2:#f1eadb;--line:#ddd2ba;--text:#1f2233;--mute:#64647a;--accent:#a9610f;--ink:#fff;--good:#15785a;--bad:#a93636;--mid:#35599f}}
+:root[data-theme=light]{--bg:#f6f1e7;--bg2:#efe8d8;--card:#fffcf5;--card2:#f1eadb;--line:#ddd2ba;--text:#1f2233;--mute:#64647a;--accent:#a9610f;--ink:#fff;--good:#15785a;--bad:#a93636;--mid:#35599f}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 72px}
+header{position:sticky;top:0;z-index:5;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--bg) 85%,transparent);border-bottom:1px solid var(--line)}
+header .in{max-width:1120px;margin:auto;padding:10px 24px;display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font:700 20px var(--serif);letter-spacing:.01em}
+.logo svg{width:28px;height:28px}
+.iconbtn{margin-left:auto;background:none;border:1px solid var(--line);border-radius:99px;width:36px;height:36px;cursor:pointer;color:var(--mute);transition:color .15s,border-color .15s}
+.iconbtn:hover{color:var(--text);border-color:var(--mute)}
+.hero{padding:64px 0 28px;max-width:760px}
+.hero h1{font:600 clamp(34px,6vw,60px)/1.04 var(--serif);margin:0 0 18px;letter-spacing:-.02em;text-wrap:balance}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{color:var(--mute);font-size:18px;margin:0;max-width:60ch}
+.layout{display:grid;grid-template-columns:168px minmax(0,1fr);gap:40px;margin-top:20px}
+.rail{position:sticky;top:76px;align-self:start;display:flex;flex-direction:column;gap:2px;padding-top:34px}
+.rail a{display:flex;gap:10px;align-items:baseline;color:var(--mute);text-decoration:none;font-size:14px;padding:7px 10px;border-radius:8px;border-left:2px solid var(--line);border-radius:0 8px 8px 0;transition:color .15s,border-color .15s,background .15s}
+.rail a i{font:italic 600 15px var(--serif);color:var(--mute)}
+.rail a:hover{color:var(--text);background:var(--card)}
+.rail a.on{color:var(--text);border-left-color:var(--accent)}.rail a.on i{color:var(--accent)}
+section{scroll-margin-top:72px;padding:34px 0 40px;border-top:1px solid var(--line)}
+section:first-child{border-top:0}
+.card{padding:0}
+.step{display:flex;align-items:baseline;gap:14px;margin:0 0 4px}
+.step b{font:italic 600 34px/1 var(--serif);color:var(--accent);min-width:26px}
+.step h2{margin:0;font:600 26px/1.2 var(--serif);letter-spacing:-.01em}
+.lede{color:var(--mute);margin:4px 0 22px 40px;max-width:62ch}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:600;transition:border-color .15s,background .15s,transform .1s}
+.btn:hover{border-color:var(--accent);background:var(--card2)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--ink);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.07);background:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.small{padding:6px 11px;font-size:14px;border-radius:8px}
+input[type=range]{accent-color:var(--accent);padding:0}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;transition:border-color .15s}
+input:hover,select:hover,textarea:hover{border-color:var(--mute)}
+textarea{min-height:120px;resize:vertical}
+label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);display:block;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:960px){.layout{display:block}.rail{position:static;flex-direction:row;overflow-x:auto;padding:14px 0 0;gap:6px}.rail a{border-left:0;border-bottom:2px solid var(--line);border-radius:0;white-space:nowrap}.rail a.on{border-bottom-color:var(--accent)}}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.lede{margin-left:0}.hero{padding-top:40px}.wrap,header .in{padding-left:16px;padding-right:16px}}
+.row>input{min-width:0;flex:1}.grid2>*{min-width:0}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;color:var(--mute);cursor:pointer;transition:.15s;background:var(--card)}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--text);background:var(--card2)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{font-size:13px;padding:3px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--mute)}
+.chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.msg{margin-top:12px;padding:10px 14px;border-radius:10px;background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid color-mix(in srgb,var(--bad) 40%,var(--line));font-size:14px}
+.msg.info{background:var(--card);border-color:var(--line)}
+.banner{border-radius:var(--r);padding:18px 22px;margin-bottom:18px;border:1px solid var(--line);border-left:4px solid var(--line);background:var(--card);font:500 20px/1.4 var(--serif)}
+.banner.signal{border-left-color:var(--good)}.banner.noise{border-left-color:var(--accent)}
+.banner b{display:block;font:700 12px system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.tile .k{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}.tile .v{font:600 34px/1.2 var(--serif);letter-spacing:-.01em;margin:2px 0}.tile .s{font-size:13px;color:var(--mute)}
+.bars{margin-top:24px}
+.bar{display:grid;grid-template-columns:90px 1fr 64px;gap:12px;align-items:center;margin:10px 0;font-size:14px}
+.track{position:relative;height:14px;border-radius:99px;background:var(--card);border:1px solid var(--line);overflow:visible}
+.fill{height:100%;border-radius:99px}
+.base{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--text);opacity:.6}
+.small{font-size:13px;color:var(--mute)}
+details{margin-top:18px}summary{cursor:pointer;color:var(--mute);font-size:14px;padding:4px 0}summary:hover{color:var(--text)}
+.heat text{fill:var(--mute);font-size:11px}
+pre.log{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:16px 0 0;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;max-height:180px;overflow:auto;white-space:pre-wrap}
+.moon{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-8deg)}}
+.progress{height:3px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:14px}
+.progress i{display:block;height:100%;width:35%;background:var(--accent);border-radius:9px;animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{0%{margin-left:-35%}100%{margin-left:100%}}
+@media(prefers-reduced-motion:reduce){.moon,.progress i{animation:none}html{scroll-behavior:auto}.btn,.drop,input,select,textarea,.rail a{transition:none}}
+.good{font:600 clamp(24px,4vw,34px)/1.2 var(--serif);letter-spacing:-.01em;margin:0 0 6px}
+.strip{display:flex;gap:6px;margin:18px 0;flex-wrap:wrap}
+.strip span{flex:1;min-width:52px;text-align:center;padding:7px 0;border-radius:8px;border:1px solid var(--line);font-size:13px;color:var(--mute)}
+.strip span.on{background:var(--accent);color:var(--ink);border-color:transparent;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px}
+.draft{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s}
+.draft:hover{border-color:var(--mute)}
+.draft .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.when{font:600 18px var(--serif)}.when small{display:block;font:400 12px system-ui,sans-serif;color:var(--mute)}
+.badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid;white-space:nowrap}
+.badge.Strong{color:var(--good);border-color:var(--good)}.badge.Weak{color:var(--bad);border-color:var(--bad)}
+.badge.Toss-up{color:var(--mid);border-color:var(--mid)}.badge.Unranked{color:var(--mute);border-color:var(--line)}
+.draft .t{font:600 18px/1.3 var(--serif)}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini label{margin:0 0 3px}
+.cb{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);text-transform:none;letter-spacing:0;font-weight:400}.cb input{width:auto}
+ul.o{margin:0;padding-left:18px;color:var(--mute);font-size:14px}
+.ins{border-top:1px dashed var(--line);padding-top:12px;font-size:14px}
+.ins h4{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.ins ul{list-style:none;margin:0 0 8px;padding:0}.ins li{margin:2px 0}
+.up{color:var(--good)}.dn{color:var(--bad)}
+.rev{font-size:13px;color:var(--mute)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+code{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px}
+.cmd{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;overflow:auto;white-space:pre;margin:6px 0}
+footer{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="var(--card2)"/><path d="M20 6a10 10 0 1 0 6 16 8 8 0 0 1-6-16z" fill="var(--accent)"/></svg>Siesta</div>
+  <button class="iconbtn" id="theme" title="Switch light / dark" aria-label="Switch light or dark theme">◐</button>
+</div></header>
+<main class="wrap">
+  <div class="hero">
+    <h1>Your week, drafted <em>while you sleep.</em></h1>
+    <p>Show it your post history. It tells you honestly whether anything in that history predicts a hit, drafts next week with Google’s free Gemini model, and says so when the answer is “go back to sleep.”</p>
+  </div>
+  <div class="layout">
+  <nav class="rail" aria-label="Steps"><a href="#history"><i>1</i>History</a><a href="#check"><i>2</i>Reality check</a><a href="#brief"><i>3</i>Brief</a><a href="#plan"><i>4</i>Plan</a></nav>
+  <div>
+  <section id="history"><div class="card">
+    <div class="step"><b>1</b><h2>Your post history</h2></div>
+    <p class="lede">Any CSV with a date, a title and a result (reactions, likes, views…). Stays on this computer.</p>
+    <div class="grid2">
+      <div>
+        <label id="droplabel">Upload a CSV</label>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="droplabel">Drop a file here, or click to choose<input type="file" id="file" accept=".csv,text/csv" hidden></div>
+      </div>
+      <div>
+        <label for="devuser">Or fetch public posts from DEV (no key needed)</label>
+        <div class="row" style="flex-wrap:nowrap"><input id="devuser" placeholder="your DEV username"><button class="btn" id="devgo">Fetch</button></div>
+        <div class="row" style="flex-wrap:nowrap;margin-top:8px"><input id="devtag" placeholder="or a tag, like python"><button class="btn" id="devtaggo">Fetch</button></div>
+        <p class="small" style="margin:8px 0 0">Only date, title, tags, reading time, cover flag and reactions are kept. Posts under 14 days old are skipped while reactions settle.</p>
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="btn small" id="demo">Just let me try it (made-up data)</button></div>
+    <div id="histmsg"></div><div class="chips" id="histchips"></div>
+  </div></section>
+
+  <section id="check"><div class="card">
+    <div class="step"><b>2</b><h2>Reality check</h2></div>
+    <p class="lede">Trained on your older posts, tested on your newest. Nothing from the test leaks into training.</p>
+    <div id="report"><p class="small">Add a history first.</p></div>
+  </div></section>
+
+  <section id="brief"><div class="card">
+    <div class="step"><b>3</b><h2>Tonight’s brief</h2></div>
+    <p class="lede">Say what the posts are about, or let it read your recent work.</p>
+    <div class="grid2">
+      <div>
+        <label for="briefbox">What should next week’s posts be about?</label>
+        <textarea id="briefbox" placeholder="e.g. I built a small tool that sorts my downloads folder, and learned a lot about file watchers."></textarea>
+        <div class="row" style="margin-top:8px"><select id="srckind" style="width:auto" aria-label="Brief source"><option value="git">Recent git commits from…</option><option value="file">A notes file…</option></select><input id="srcpath" placeholder="/path/to/folder" style="flex:1;min-width:140px"><button class="btn small" id="srcgo">Read</button></div>
+      </div>
+      <div>
+        <label for="n">How many drafts: <span id="nv">5</span></label>
+        <input type="range" id="n" min="1" max="7" value="5" style="padding:0">
+        <label for="model" style="margin-top:14px">Writer</label>
+        <select id="model"></select>
+        <p class="small" id="mdhint"></p>
+        <button class="btn primary" id="go" style="margin-top:6px">Draft my week</button>
+      </div>
+    </div>
+    <div id="runbox"></div>
+    <details><summary>Run this every week without opening the app</summary>
+      <div class="row" style="margin-top:10px"><select id="sday" style="width:auto" aria-label="Weekday"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select><input id="stime" value="02:00" style="width:100px" aria-label="Time"><input id="spath" placeholder="folder with your git project" style="flex:1;min-width:160px" aria-label="Project folder"><button class="btn small" id="sgo">Show commands</button></div>
+      <div id="sout"></div>
+    </details>
+  </div></section>
+
+  <section id="plan"><div class="card">
+    <div class="step"><b>4</b><h2>Morning plan</h2></div>
+    <p class="lede">Edit anything, then press Rescore. Nothing is ever posted for you.</p>
+    <div id="planbox"><p class="small">No plan yet.</p></div>
+  </div></section>
+  <footer>Your history and every score stay on this computer. Only the brief and your common tags go to Google’s Gemini API, and only when you pick a Gemini writer. No tracking.</footer>
+  </div>
+  </div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const h=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,v]of Object.entries(a)){if(x==='class')e.className=v;else if(x.startsWith('on'))e.addEventListener(x.slice(2),v);else if(v===true)e.setAttribute(x,'');else if(v!==false&&v!=null)e.setAttribute(x,v)}for(const c of k.flat())e.append(c&&c.nodeType?c:document.createTextNode(c??''));return e};
+const NS='http://www.w3.org/2000/svg';
+const sv=(t,a={},...k)=>{const e=document.createElementNS(NS,t);for(const[x,v]of Object.entries(a))e.setAttribute(x,v);for(const c of k)e.append(c&&c.nodeType?c:document.createTextNode(c));return e};
+async function api(p,o={}){const r=await fetch(p,o);const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.statusText);return j}
+const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],BLK=['00–03','04–07','08–11','12–15','16–19','20–23'];
+const pct=v=>v==null?'–':Math.round(v*100)+'%';
+const GLYPH={Strong:'▲ Strong',Weak:'▼ Weak','Toss-up':'◆ Toss-up',Unranked:'○ Unranked'};
+let S=null,drafts=[];
+
+try{const t=localStorage.getItem('siesta-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+$('#theme').onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue('--bg').trim()==='#0e1118';d.dataset.theme=dark?'light':'dark';try{localStorage.setItem('siesta-theme',d.dataset.theme)}catch(e){}};
+$('#n').oninput=e=>$('#nv').textContent=e.target.value;
+
+function msg(box,text,info){const b=$(box);b.replaceChildren();if(text)b.append(h('div',{class:'msg'+(info?' info':''),role:'status'},text))}
+async function guarded(fn,box){try{await fn()}catch(e){msg(box,e.message)}}
+
+/* ---------- history ---------- */
+const sendCsv=async f=>{msg('#histmsg','Reading…',1);await guarded(async()=>{await api('/api/history/csv',{method:'POST',body:await f.text()});msg('#histmsg','');await load()},'#histmsg')};
+const drop=$('#drop'),file=$('#file');
+drop.onclick=()=>file.click();drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();file.click()}};
+file.onchange=()=>file.files[0]&&sendCsv(file.files[0]);
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');e.dataTransfer.files[0]&&sendCsv(e.dataTransfer.files[0])};
+const dev=(body)=>async()=>{msg('#histmsg','Fetching from DEV… this can take a minute for a big tag.',1);await guarded(async()=>{await post('/api/history/dev',body());msg('#histmsg','');await load()},'#histmsg')};
+$('#devgo').onclick=dev(()=>({username:$('#devuser').value}));
+$('#devtaggo').onclick=dev(()=>({tag:$('#devtag').value}));
+$('#demo').onclick=()=>guarded(async()=>{await post('/api/history/demo');await load()},'#histmsg');
+
+function renderHistory(){
+  const c=$('#histchips');c.replaceChildren();
+  if(!S.history){return}
+  const x=S.history;
+  c.append(h('span',{class:'chip ok'},'✓ '+x.label),h('span',{class:'chip'},x.rows.toLocaleString()+' posts'),h('span',{class:'chip'},x.from+' → '+x.to));
+  if(x.kind==='demo')c.append(h('span',{class:'chip'},'made-up numbers: for trying the app only'));
+  if(S.error)msg('#histmsg',S.error)
+}
+
+/* ---------- report ---------- */
+function heat(m){
+  const W=44,H=30,L=38,T=20,svg=sv('svg',{viewBox:`0 0 ${L+6*W} ${T+7*H+4}`,width:'100%',role:'img','aria-label':'Hit rate by weekday and four-hour window'});
+  svg.setAttribute('class','heat');
+  BLK.forEach((b,i)=>svg.append(sv('text',{x:L+i*W+W/2,y:12,'text-anchor':'middle'},b)));
+  const rates=m.flat().filter(c=>c.n>=15).map(c=>c.rate),lo=Math.min(...rates),hi=Math.max(...rates);
+  m.forEach((row,r)=>{svg.append(sv('text',{x:0,y:T+r*H+H/2+4},DAYS[r]));row.forEach((c,i)=>{
+    const ok=c.n>=15,t=ok&&hi>lo?(c.rate-lo)/(hi-lo):0;
+    const rect=sv('rect',{x:L+i*W+2,y:T+r*H+2,width:W-4,height:H-4,rx:6,fill:ok?'var(--accent)':'var(--bg2)','fill-opacity':ok?.15+.85*t:1,stroke:'var(--line)'});
+    rect.append(sv('title',{},`${DAYS[r]} ${BLK[i]} UTC: ${ok?pct(c.rate)+' hits':'too few posts'} (${c.n} posts)`));svg.append(rect)})});
+  return svg}
+function renderReport(){
+  const b=$('#report');b.replaceChildren();
+  if(!S.report){b.append(h('p',{class:'small'},S.error||'Add a history first.'));return}
+  const r=S.report,f=n=>n==null?'–':n.toFixed(2);
+  b.append(h('div',{class:'banner '+r.kind},h('b',{},r.kind==='signal'?'Verdict: some signal':r.kind==='noise'?'Verdict: no signal':'Verdict'),r.verdict));
+  b.append(h('div',{class:'tiles'},
+    h('div',{class:'tile'},h('div',{class:'k'},'Ranking skill (AUC)'),h('div',{class:'v'},f(r.auc)),h('div',{class:'s'},r.auc_ci?`95% range ${f(r.auc_ci[0])} to ${f(r.auc_ci[1])}. 0.50 is a coin flip.`:'')),
+    h('div',{class:'tile'},h('div',{class:'k'},'Top 20% pick lift'),h('div',{class:'v'},r.lift?r.lift.toFixed(2)+'×':'–'),h('div',{class:'s'},r.lift_ci?`range ${r.lift_ci[0].toFixed(2)}× to ${r.lift_ci[1].toFixed(2)}×. 1× is no help.`:'')),
+    h('div',{class:'tile'},h('div',{class:'k'},'Hit rate, newest posts'),h('div',{class:'v'},pct(r.hit_rate)),h('div',{class:'s'},`A hit = score of ${r.thr} or more. ${r.n_test} posts tested, ${r.n_train} trained.`)),
+    h('div',{class:'tile'},h('div',{class:'k'},'Fancier model, same test'),h('div',{class:'v'},f(r.flex_auc)),h('div',{class:'s'},'Gradient boosting AUC, for comparison only.'))));
+  const bars=h('div',{class:'bars'},h('div',{class:'small'},'Of the newest posts, how many were hits in each group the model made (line = overall rate):'));
+  const col={Strong:'var(--good)','Toss-up':'var(--mid)',Weak:'var(--bad)'};
+  for(const[k,v]of Object.entries(r.bands)){const w=Math.min(100,(v.hit||0)*100);bars.append(h('div',{class:'bar'},h('span',{},k),h('div',{class:'track'},h('div',{class:'fill',style:`width:${w}%;background:${col[k]}`}),h('div',{class:'base',style:`left:${r.hit_rate*100}%`})),h('span',{},pct(v.hit)+' ('+v.n+')')))}
+  b.append(bars);
+  b.append(h('details',{},h('summary',{},'When did your posts do well? (descriptive, not a forecast)'),heat(S.heat),h('p',{class:'small'},'Brighter = higher hit rate. Greyed cells have fewer than 15 posts. Times are UTC.')))
+}
+
+/* ---------- run ---------- */
+function renderModels(){
+  const m=$('#model'),cur=m.value;m.replaceChildren(h('option',{value:''},'Plain templates (no model)'));
+  S.llm.models.forEach(x=>m.append(h('option',{value:x},x)));
+  m.value=cur||S.llm.default||'';
+  $('#mdhint').textContent=S.llm.up?(S.llm.models.length?'Free Gemini key found. Your brief and common tags go to Google; the history stays here.':'Your key works, but no Gemini Flash model is open to it.'):'No working Gemini key, so drafts use plain templates. For model-written drafts, get a free key at aistudio.google.com/apikey and start Siesta with GEMINI_API_KEY set.'}
+let poll=null;
+function renderJob(){
+  const j=S.job,box=$('#runbox');box.replaceChildren();
+  const run=j.state==='running';$('#go').disabled=run;
+  if(j.state==='idle')return;
+  if(run)box.append(h('p',{},h('span',{class:'moon'},'🌙'),' Working while you rest…'),h('div',{class:'progress'},h('i')));
+  if(j.state==='error')box.append(h('div',{class:'msg'},j.error));
+  if(j.log.length)box.append(h('pre',{class:'log'},j.log.join('\n')));
+  if(run&&!poll)poll=setInterval(load,1200);
+  if(!run&&poll){clearInterval(poll);poll=null}}
+$('#go').onclick=()=>guarded(async()=>{
+  await post('/api/run',{brief:$('#briefbox').value,n:+$('#n').value,model:$('#model').value});msg('#runbox','');await load();},'#runbox');
+$('#srcgo').onclick=()=>guarded(async()=>{const r=await post('/api/brief',{kind:$('#srckind').value,path:$('#srcpath').value});
+  if(!r.brief)throw new Error('Nothing found there.');$('#briefbox').value=r.brief},'#runbox');
+$('#sgo').onclick=()=>guarded(async()=>{
+  const q=new URLSearchParams({day:$('#sday').value,time:$('#stime').value,source:$('#spath').value||'/path/to/your/project',kind:'git'});
+  const r=await api('/api/schedule?'+q);const o=$('#sout');o.replaceChildren(
+    h('p',{class:'small'},'macOS / Linux'),h('div',{class:'cmd'},r.mac_linux),h('p',{class:'small'},'Windows'),h('div',{class:'cmd'},r.windows),h('p',{class:'small'},r.note))},'#sout');
+
+/* ---------- plan ---------- */
+function localSlot(d){const t=new Date(Date.UTC(2026,0,5+d.wd,d.hour));return t.toLocaleString(undefined,{weekday:'short',hour:'2-digit',minute:'2-digit'})}
+function insights(d){
+  const el=h('div',{class:'ins'});
+  if(d.why&&d.why.length){el.append(h('h4',{},'What the history links to this draft'),h('ul',{},d.why.map(w=>h('li',{class:w.up?'up':'dn'},(w.up?'▲ ':'▼ ')+w.text))))}
+  if(d.ideas&&d.ideas.length){el.append(h('h4',{},'Changes the model likes (a guess, not proof)'),h('ul',{},d.ideas.map(i=>h('li',{},'+'+Math.round(i.delta*100)+' pts: '+i.text))))}
+  return el}
+function card(d){
+  const st=Object.assign({},d);const root=h('article',{class:'draft'});
+  const when=h('div',{class:'when'}),badge=h('span',{class:'badge'}),ins=h('div');
+  const T=h('textarea',{'aria-label':'Title',class:'t',rows:2,style:'min-height:0;resize:none'},d.title),G=h('input',{value:d.tags.join(', '),'aria-label':'Tags'}),
+    M=h('input',{type:'number',min:1,max:30,value:d.minutes,'aria-label':'Minutes to read'}),
+    C=h('input',{type:'checkbox'}),
+    D=h('select',{'aria-label':'Day (UTC)'},DAYS.map((x,i)=>h('option',{value:i},x))),
+    H=h('select',{'aria-label':'Hour (UTC)'},[...Array(24).keys()].map(x=>h('option',{value:x},String(x).padStart(2,'0')+':00')));
+  C.checked=!!d.cover;D.value=d.wd;H.value=d.hour;
+  const paint=()=>{when.replaceChildren(localSlot(st),h('small',{},`${DAYS[st.wd]} ${String(st.hour).padStart(2,'0')}:00 UTC · your local time shown`));
+    badge.className='badge '+st.band;badge.textContent=GLYPH[st.band]+(st.band==='Unranked'?'':' · '+Math.round(st.p*100)+'%');
+    ins.replaceChildren(insights(st))};
+  const read=()=>({title:T.value,tags:G.value.split(/[ ,]+/).filter(Boolean),minutes:+M.value||5,cover:C.checked?1:0,wd:+D.value,hour:+H.value});
+  const re=h('button',{class:'btn small primary'},'Rescore');
+  re.onclick=()=>guarded(async()=>{re.disabled=true;try{const s=await post('/api/score',{draft:read()});Object.assign(st,read(),s);d.edit=true;paint()}finally{re.disabled=false}},'#planmsg');
+  const cp=h('button',{class:'btn small'},'Copy');
+  cp.onclick=async()=>{const x=read(),t=`# ${x.title}\n\nTags: ${x.tags.join(', ')}\n\n`+st.outline.map(o=>'- '+o).join('\n');try{await navigator.clipboard.writeText(t);cp.textContent='Copied ✓'}catch(e){cp.textContent='Copy failed'}setTimeout(()=>cp.textContent='Copy',1600)};
+  root.append(h('div',{class:'top'},when,badge),T,G,
+    h('div',{class:'mini'},h('div',{},h('label',{},'Minutes'),M),h('label',{class:'cb',style:'margin-top:18px'},C,'Has a cover image'),h('div',{},h('label',{},'Day (UTC)'),D),h('div',{},h('label',{},'Hour (UTC)'),H)),
+    h('ul',{class:'o'},d.outline.map(o=>h('li',{},o))),ins,
+    d.original?h('div',{class:'rev'},`Revised once: “${d.original.title}” scored ${Math.round(d.original.p*100)}%, this version ${Math.round(d.p*100)}%.`):'',
+    h('div',{class:'actions'},re,cp));
+  root.read=()=>({...read(),band:st.band,p:st.p,outline:st.outline});paint();return root}
+function csv(rows){const q=v=>'"'+String(v).replace(/"/g,'""')+'"';return rows.map(r=>r.map(q).join(',')).join('\n')}
+function renderPlan(){
+  const b=$('#planbox');b.replaceChildren(h('div',{id:'planmsg'}));
+  const p=S.plan;if(!p){b.append(h('p',{class:'small'},'No plan yet. Write a brief above and press “Draft my week”.'));return}
+  b.append(h('p',{class:'good'},p.verdict.text),h('p',{class:'small'},`Made ${p.created.replace('T',' ')} · writer: ${p.mode==='templates'?'plain templates':p.mode}`+(p.signal?'':' · the history showed no usable pattern, so nothing is ranked')));
+  b.append(h('div',{class:'strip','aria-label':'Days with a draft'},DAYS.map((x,i)=>h('span',{class:p.drafts.some(d=>d.wd===i)?'on':''},x))));
+  const cards=p.drafts.map(card);b.append(h('div',{class:'cards'},cards));
+  const dl=h('button',{class:'btn'},'Download plan.csv');
+  dl.onclick=()=>{const rows=[['day_utc','hour_utc','local_time','title','tags','minutes','cover','band','score','outline']];
+    cards.forEach(c=>{const x=c.read();rows.push([DAYS[x.wd],x.hour,localSlot(x),x.title,x.tags.join(','),x.minutes,x.cover,x.band,x.p.toFixed(3),x.outline.join(' | ')])});
+    const a=h('a',{href:URL.createObjectURL(new Blob([csv(rows)],{type:'text/csv'})),download:'siesta-plan.csv'});a.click()};
+  b.append(h('div',{class:'row',style:'margin-top:18px'},dl,h('span',{class:'small'},'A score is a ranking, not odds. Your edits are included.')))}
+
+async function load(){
+  const was=S&&S.job.state;S=await api('/api/state');
+  renderHistory();renderReport();renderModels();renderJob();
+  if(S.job.state!=='running'||!$('#planbox').children.length)renderPlan();
+  if(was==='running'&&S.job.state==='done')location.hash='#plan'}
+load();
+const links=[...document.querySelectorAll('.rail a')];
+if('IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle('on',l.hash==='#'+e.target.id))}),{rootMargin:'-30% 0px -60% 0px'});
+  document.querySelectorAll('main section').forEach(s=>io.observe(s))}
+</script>
+</body>
+</html>
